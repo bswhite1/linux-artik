@@ -160,8 +160,6 @@ static void st7796s_set_sequence(struct st7796s *ctx)
 		dev_err(ctx->dev, "set sequence error\n");
 		return;
 	}
-	u8 mode[4];
-	int mode_len = ARRAY_SIZE(mode);
 
 	st7796s_dcs_write_seq_static(ctx, 0x11); // Sleep Out
 
@@ -243,6 +241,8 @@ static int st7796s_set_brightness(struct backlight_device *bl_dev)
 {
 	struct st7796s *ctx = (struct st7796s *)bl_get_data(bl_dev);
 	int brightness = bl_dev->props.brightness;
+	u8 brightness_update[] = {0x51, brightness};
+
 	/* FIXME: MIPI_DSI_DCS_SHORT_WRITE_PARAM is not working properly, the
 	 * panel is turned on from Power key source.
 	 */
@@ -257,7 +257,6 @@ static int st7796s_set_brightness(struct backlight_device *bl_dev)
 		return -ENODEV;
 	}
 
-	u8 brightness_update[2] = {0x51, brightness};
 	st7796s_dcs_write(ctx, brightness_update, ARRAY_SIZE(brightness_update));
 
 	return 0;
